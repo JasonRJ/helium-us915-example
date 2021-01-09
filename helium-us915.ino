@@ -54,23 +54,23 @@
 #include <hal/hal.h>
 #include <SPI.h>
 
-// S76G UART1 (Console)
-#define S76G_CONSOLE_TX                   PA9
-#define S76G_CONSOLE_RX                   PA10
+// ArSiP S7xx UART1 (Console)
+#define S7xx_CONSOLE_TX                  PA9
+#define S7xx_CONSOLE_RX                  PA10
 
-// S76G - Internal STM32L073RX <--> SX1276 SPI2 GPIOs
-#define S76G_SX1276_MOSI                  PB15
-#define S76G_SX1276_MISO                  PB14
-#define S76G_SX1276_SCK                   PB13
-#define S76G_SX1276_SS                    PB12
-#define S76G_SX1276_RESET                 PB10
-#define S76G_SX1276_DIO0                  PB11
-#define S76G_SX1276_DIO1                  PC13
-#define S76G_SX1276_DIO2                  PB9
-#define S76G_SX1276_DIO3                  PB4
-#define S76G_SX1276_DIO4                  PB3
-#define S76G_SX1276_DIO5                  PA15
-#define S76G_SX1276_ANTENNA_SWITCH_RXTX   PA1  // Antenna RF switch 1:RX, 0:TX
+// ArSiP S7xx Internal SPI2 STM32L073RZ(U|Y)x <--> SX127x
+#define S7xx_RADIO_MOSI                  PB15
+#define S7xx_RADIO_MISO                  PB14
+#define S7xx_RADIO_SCK                   PB13
+#define S7xx_RADIO_NSS                   PB12
+#define S7xx_RADIO_NRESET                PB10
+#define S7xx_RADIO_DIO0                  PB11
+#define S7xx_RADIO_DIO1                  PC13
+#define S7xx_RADIO_DIO2                  PB9
+#define S7xx_RADIO_DIO3                  PB4
+#define S7xx_RADIO_DIO4                  PB3
+#define S7xx_RADIO_DIO5                  PA15
+#define S7xx_RADIO_ANTENNA_SWITCH_RXTX   PA1  // Radio Antenna Switch 1:RX, 0:TX
 
 
 // Configure the three OTAA keys here or in an external file and #include that file
@@ -109,12 +109,12 @@ static osjob_t sendjob;
 // Schedule TX every TX_INTERVAL seconds (might become longer due to duty cycle limitations).
 const unsigned TX_INTERVAL = 60;
 
-// S76G Pin Mapping
+// ArSiP S7xx Pin Mapping
 const lmic_pinmap lmic_pins = {
-        .nss = S76G_SX1276_SS,
-        .rxtx = S76G_SX1276_ANTENNA_SWITCH_RXTX,
-        .rst = S76G_SX1276_RESET,
-        .dio = {S76G_SX1276_DIO0, S76G_SX1276_DIO1, S76G_SX1276_DIO2},
+        .nss = S7xx_RADIO_NSS,
+        .rxtx = S7xx_RADIO_ANTENNA_SWITCH_RXTX,
+        .rst = S7xx_RADIO_NRESET,
+        .dio = {S7xx_RADIO_DIO0, S7xx_RADIO_DIO1, S7xx_RADIO_DIO2},
         .rxtx_rx_active = 1,
         .rssi_cal = 10,
         .spi_freq = 1000000
@@ -268,15 +268,15 @@ void do_send(osjob_t *j) {
 
 void setup() {
 
-    // Configure S76G Serial1 to Arduino Serial
-    Serial.setRx(S76G_CONSOLE_RX);
-    Serial.setTx(S76G_CONSOLE_TX);
+    // Configure ArSiP S7xx Serial1 to Arduino Serial
+    Serial.setTx(S7xx_CONSOLE_TX);
+    Serial.setRx(S7xx_CONSOLE_RX);
 
-    // Configure S76G SPI2 to Arduino SPI
-    SPI.setMISO(S76G_SX1276_MISO);
-    SPI.setMOSI(S76G_SX1276_MOSI);
-    SPI.setSCLK(S76G_SX1276_SCK);
-    SPI.setSSEL(S76G_SX1276_SS);
+    // Configure ArSiP S7xx SPI2 to Arduino SPI
+    SPI.setMISO(S7xx_RADIO_MISO);
+    SPI.setMOSI(S7xx_RADIO_MOSI);
+    SPI.setSCLK(S7xx_RADIO_SCK);
+    SPI.setSSEL(S7xx_RADIO_NSS);
 
     Serial.begin(115200);
     time_t serialStart = millis();
