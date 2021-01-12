@@ -54,23 +54,47 @@
 #include <hal/hal.h>
 #include <SPI.h>
 
+// RAK7200 S76G GPIOs
+#define RAK7200_S76G_BLUE_LED             PA8  // Blue LED (D2) active low
+#define RAK7200_S76G_RED_LED              PA11 // Red LED (D3) active low
+#define RAK7200_S76G_GREEN_LED            PA12 // Green LED (D4) active low
+#define RAK7200_S76G_ADC_VBAT             PB0  // ADC connected to the battery (VBATT 1M PB0 1.5M GND) 1.5M / (1M + 1.5M) = 0.6
+#define RAK7200_S76G_LIS3DH_INT1          PA0  // LIS3DH (U5) (I2C address 0x19) Interrupt INT1
+#define RAK7200_S76G_LIS3DH_INT2          PB5  // LIS3DH (U5) (I2C address 0x19) Interrupt INT2
+#define RAK7200_S76G_LPS_INT              PA5  // LPS22HB (U7) (I2C address 0x5C) Interrupt (mutually exclusive with SPI1_NSS)
+#define RAK7200_S76G_MPU_INT              PA5  // MPU9250 (U8) (I2C address 0x68) Interrupt (mutually exclusive with SPI1_CLK)
+#define RAK7200_S76G_TP4054_CHG1          PB1  // ADC TP4054 (U3)
+#define RAK7200_S76G_TP4054_CHG2          PB8  // ADC TP4054 (U3)
+
 // ArSiP S7xx UART1 (Console)
-#define S7xx_CONSOLE_TX                  PA9
-#define S7xx_CONSOLE_RX                  PA10
+#define S7xx_CONSOLE_TX                   PA9  // UART1 (CH340E U1)
+#define S7xx_CONSOLE_RX                   PA10 // UART1 (CH340E U1)
 
 // ArSiP S7xx Internal SPI2 STM32L073RZ(U|Y)x <--> SX127x
-#define S7xx_RADIO_MOSI                  PB15
-#define S7xx_RADIO_MISO                  PB14
-#define S7xx_RADIO_SCK                   PB13
-#define S7xx_RADIO_NSS                   PB12
-#define S7xx_RADIO_NRESET                PB10
-#define S7xx_RADIO_DIO0                  PB11
-#define S7xx_RADIO_DIO1                  PC13
-#define S7xx_RADIO_DIO2                  PB9
-#define S7xx_RADIO_DIO3                  PB4
-#define S7xx_RADIO_DIO4                  PB3
-#define S7xx_RADIO_DIO5                  PA15
-#define S7xx_RADIO_ANTENNA_SWITCH_RXTX   PA1  // Radio Antenna Switch 1:RX, 0:TX
+#define S7xx_SX127x_MOSI                  PB15
+#define S7xx_SX127x_MISO                  PB14
+#define S7xx_SX127x_SCK                   PB13
+#define S7xx_SX127x_NSS                   PB12
+#define S7xx_SX127x_NRESET                PB10
+#define S7xx_SX127x_DIO0                  PB11
+#define S7xx_SX127x_DIO1                  PC13
+#define S7xx_SX127x_DIO2                  PB9
+#define S7xx_SX127x_DIO3                  PB4
+#define S7xx_SX127x_DIO4                  PB3
+#define S7xx_SX127x_DIO5                  PA15
+#define S7xx_SX127x_ANTENNA_SWITCH_RXTX   PA1  // Radio Antenna Switch 1:RX, 0:TX
+
+// ArSiP S7xG SONY CXD5603GF GNSS
+#define RAK7200_S76G_CXD5603_POWER_ENABLE PC4  // Enable 1V8 Power to GNSS (U2 TPS62740)
+#define S7xG_CXD5603_RESET                PB2
+#define S7xG_CXD5603_LEVEL_SHIFTER        PC6
+#define S7xG_CXD5603_UART_TX              PC10
+#define S7xG_CXD5603_UART_RX              PC11
+#define S7xG_CXD5603_BAUD_RATE            115200
+
+// ArSiP S7xx I2C1
+#define S7xx_I2C_SCL                      PB6  // I2C1
+#define S7xx_I2C_SDA                      PB7  // I2C1
 
 
 // Configure the three OTAA keys here or in an external file and #include that file
@@ -111,10 +135,10 @@ const unsigned TX_INTERVAL = 60;
 
 // ArSiP S7xx Pin Mapping
 const lmic_pinmap lmic_pins = {
-        .nss = S7xx_RADIO_NSS,
-        .rxtx = S7xx_RADIO_ANTENNA_SWITCH_RXTX,
-        .rst = S7xx_RADIO_NRESET,
-        .dio = {S7xx_RADIO_DIO0, S7xx_RADIO_DIO1, S7xx_RADIO_DIO2},
+        .nss = S7xx_SX127x_NSS,
+        .rxtx = S7xx_SX127x_ANTENNA_SWITCH_RXTX,
+        .rst = S7xx_SX127x_NRESET,
+        .dio = {S7xx_SX127x_DIO0, S7xx_SX127x_DIO1, S7xx_SX127x_DIO2},
         .rxtx_rx_active = 1,
         .rssi_cal = 10,
         .spi_freq = 1000000
@@ -273,10 +297,10 @@ void setup() {
     Serial.setRx(S7xx_CONSOLE_RX);
 
     // Configure ArSiP S7xx SPI2 to Arduino SPI
-    SPI.setMISO(S7xx_RADIO_MISO);
-    SPI.setMOSI(S7xx_RADIO_MOSI);
-    SPI.setSCLK(S7xx_RADIO_SCK);
-    SPI.setSSEL(S7xx_RADIO_NSS);
+    SPI.setMISO(S7xx_SX127x_MISO);
+    SPI.setMOSI(S7xx_SX127x_MOSI);
+    SPI.setSCLK(S7xx_SX127x_SCK);
+    SPI.setSSEL(S7xx_SX127x_NSS);
 
     Serial.begin(115200);
     time_t serialStart = millis();
