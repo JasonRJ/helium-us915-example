@@ -66,33 +66,34 @@
 #define RAK7200_S76G_TP4054_CHG1          PB1  // ADC TP4054 (U3)
 #define RAK7200_S76G_TP4054_CHG2          PB8  // ADC TP4054 (U3)
 
-// ArSiP S7xx UART1 (Console)
+// AcSiP S7xx UART1 (Console)
 #define S7xx_CONSOLE_TX                   PA9  // UART1 (CH340E U1)
 #define S7xx_CONSOLE_RX                   PA10 // UART1 (CH340E U1)
 
-// ArSiP S7xx Internal SPI2 STM32L073RZ(U|Y)x <--> SX127x
-#define S7xx_SX127x_MOSI                  PB15
-#define S7xx_SX127x_MISO                  PB14
-#define S7xx_SX127x_SCK                   PB13
-#define S7xx_SX127x_NSS                   PB12
+// AcSiP S7xx Internal SPI2 STM32L073RZ(U|Y)x <--> SX127x
+#define S7xx_SX127x_MOSI                  PB15 // SPI2
+#define S7xx_SX127x_MISO                  PB14 // SPI2
+#define S7xx_SX127x_SCK                   PB13 // SPI2
+#define S7xx_SX127x_NSS                   PB12 // SPI2
 #define S7xx_SX127x_NRESET                PB10
 #define S7xx_SX127x_DIO0                  PB11
 #define S7xx_SX127x_DIO1                  PC13
 #define S7xx_SX127x_DIO2                  PB9
-#define S7xx_SX127x_DIO3                  PB4
-#define S7xx_SX127x_DIO4                  PB3
-#define S7xx_SX127x_DIO5                  PA15
+#define S7xx_SX127x_DIO3                  PB4  // unused
+#define S7xx_SX127x_DIO4                  PB3  // unused
+#define S7xx_SX127x_DIO5                  PA15 // unused
 #define S7xx_SX127x_ANTENNA_SWITCH_RXTX   PA1  // Radio Antenna Switch 1:RX, 0:TX
 
-// ArSiP S7xG SONY CXD5603GF GNSS
+// AcSiP S7xG SONY CXD5603GF GNSS
 #define RAK7200_S76G_CXD5603_POWER_ENABLE PC4  // Enable 1V8 Power to GNSS (U2 TPS62740)
-#define S7xG_CXD5603_RESET                PB2
+#define T_Motion_S76G_CXD5603_1PPS        PB5  // TTGO T-Motion 1PPS
+#define S7xG_CXD5603_RESET                PB2  // Reset does not appear to work
 #define S7xG_CXD5603_LEVEL_SHIFTER        PC6
-#define S7xG_CXD5603_UART_TX              PC10
-#define S7xG_CXD5603_UART_RX              PC11
+#define S7xG_CXD5603_UART_TX              PC10 // UART4
+#define S7xG_CXD5603_UART_RX              PC11 // UART4
 #define S7xG_CXD5603_BAUD_RATE            115200
 
-// ArSiP S7xx I2C1
+// AcSiP S7xx I2C1
 #define S7xx_I2C_SCL                      PB6  // I2C1
 #define S7xx_I2C_SDA                      PB7  // I2C1
 
@@ -133,7 +134,7 @@ static osjob_t sendjob;
 // Schedule TX every TX_INTERVAL seconds (might become longer due to duty cycle limitations).
 const unsigned TX_INTERVAL = 60;
 
-// ArSiP S7xx Pin Mapping
+// AcSiP S7xx Pin Mapping
 const lmic_pinmap lmic_pins = {
         .nss = S7xx_SX127x_NSS,
         .rxtx = S7xx_SX127x_ANTENNA_SWITCH_RXTX,
@@ -292,11 +293,11 @@ void do_send(osjob_t *j) {
 
 void setup() {
 
-    // Configure ArSiP S7xx Serial1 to Arduino Serial
+    // Configure AcSiP S7xx Serial1 to Arduino Serial
     Serial.setTx(S7xx_CONSOLE_TX);
     Serial.setRx(S7xx_CONSOLE_RX);
 
-    // Configure ArSiP S7xx SPI2 to Arduino SPI
+    // Configure AcSiP S7xx SPI2 to Arduino SPI
     SPI.setMISO(S7xx_SX127x_MISO);
     SPI.setMOSI(S7xx_SX127x_MOSI);
     SPI.setSCLK(S7xx_SX127x_SCK);
